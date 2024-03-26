@@ -17,12 +17,12 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <section class=" grid h-16 place-items-center ">
+  <section class=" grid h-16 place-items-center pt-10 ">
     <div>
-      <p class="text-4xl pb-6">All tasks</p>
+      <p class="xl:text-4xl pb-6 text-2xl">All tasks</p>
       <div class="container overflow-x-auto shadow-md sm:rounded-lg flex flex-col justify-center  items-center  w-full">
-        <table class=" text-sm w-full text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <table class=" text-sm w-full text-left rtl:text-right text-gray-500 dark:text-gray-400 lg:text-xl">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 lg:text-xl">
           <tr>
             <th scope="col" class="px-6 py-3">
               #
