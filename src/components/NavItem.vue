@@ -11,7 +11,7 @@ import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 </script>
 <template>
-  <nav class="  z-50   overflow-x-hidden bg-white border-gray-200 dark:bg-gray-900 w-full lg:text-2xl mt-1">
+  <nav class="  z-50 fixed  overflow-x-hidden bg-white border-gray-200 dark:bg-gray-900 w-full lg:text-2xl mt-1">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
       <div class="flex items-center space-x-3 rtl:space-x-reverse">
         <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Vue.js_Logo_2.svg" class="h-8" alt="Logo" />
