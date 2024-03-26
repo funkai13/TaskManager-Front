@@ -12,10 +12,6 @@ import NavItem from './components/NavItem.vue'
 import LoginView from './views/LoginView.vue'
 </script>
 <template>
-  <header class="aspect-auto">
     <NavItem />
-  </header>
-  <div class="aspec-auto">
     <RouterView />
-  </div>
 </template>
