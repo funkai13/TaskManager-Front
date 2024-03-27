@@ -21,28 +21,19 @@ export const useAuthStore = defineStore('auth', {
       this.authRole = role;
     },
     async login(form) {
-      console.log(form);
       await axios
         .post('api/auth/login', form,)
         .then((res) => {
           const { access_token, role } = res.data;
           const id = res.data.data.id;
-          console.log(res.data);
-          console.log(id);
           this.setAuthToken(access_token);
           this.setAuthUser(id);
           this.setAuthRole(role);
-          console.log(useAuthStore().token); // Acceder al token actualizado usando useAuthStore()
           this.router.push('/tasks');
-          console.log(useAuthStore().role);
+
         })
         .catch((errors) => {
-          console.log(form);
-          let desc = ''
-          errors.response.data.errors.map((e) => {
-            desc = desc + '' + e
-          })
-          //show_alerta(desc, 'error', '')
+          console.log(errors);
         })
     },
     async register(form) {
@@ -60,17 +51,13 @@ export const useAuthStore = defineStore('auth', {
           this.router.push('/taks')
         })
         .catch((errors) => {
-          let desc = ''
-          errors.response.data.errors.map((e) => {
-            desc = desc + '' + e
-          })
-          // show_alerta(desc, 'error', '')
+         console.log(errors)
         })
     },
     async logout() {
       await axios.post('api/auth/logout', this.token)
       this.authToken = null
-      this.authUser = null
+      this.authId = null
       this.router.push('/login')
     },
     persist: true
