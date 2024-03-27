@@ -3,14 +3,37 @@
 import { onMounted, ref } from 'vue'
 import { initFlowbite } from 'flowbite'
 import { useAuthStore } from '@/stores/auth';
+import router from '@/router/index.js'
 
-const authStore = useAuthStore();
 const form = ref({
-  email: '',
-  password: '',
+  title: '',
+  description: '',
+  created_by: 'admin',
+  status_id: '',
+  employee_id: '',
 });
+// onMounted(async () => {
+//   try {
+//     await axios.post('http://127.0.0.1:8000/api/tasks',form.value)
+//       .then(response =>{
+//         console.log(response)
+//       })
+//
+//   } catch (error) {
+//     console.log('error', error)
+//   }
+// })
 const submitForm = async () => {
-  await authStore.login(form.value)
+  try {
+    await axios.post('http://127.0.0.1:8000/api/tasks',form.value)
+      .then(response =>{
+      console.log(response)
+    })
+  } catch (error) {
+    console.log('error', error)
+  }
+ console.log(form.value);
+ await router.push('/tasks');
 }
 
 // initialize components based on data attribute selectors
@@ -27,14 +50,21 @@ onMounted(() => {
         <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
           <div class="sm:col-span-2">
             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                   for="name">Title</label>
-            <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Type Task Title" required="">
+                   >Title</label>
+            <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                   placeholder="Type Task Title"
+                   required="" type="text"
+                   v-model="form.title">
           </div>
           <div class="w-full">
             <label for="brand" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Assigned Employee</label>
-            <input type="text" name="brand" id="brand" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Employee ID" required="">
-            <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white mt-3">Estatus</label>
-            <select id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+            <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                   placeholder="Employee ID"
+                   type="text"
+                   v-model="form.employee_id">
+            <label   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white mt-3">Estatus</label>
+            <select  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                     v-model="form.status_id">
               <option selected="">Select Estatus</option>
               <option value="1">Pendiente</option>
               <option value="2">En proceso</option>
@@ -44,8 +74,11 @@ onMounted(() => {
           </div>
 
           <div class="sm:col-span-2">
-            <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-            <textarea id="description" rows="8" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Your description here"></textarea>
+            <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+            <textarea class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder="Your description here"
+                      v-model="form.description"
+                      rows="8"></textarea>
           </div>
         </div>
         <button type="submit" class="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
@@ -55,3 +88,11 @@ onMounted(() => {
     </div>
   </section>
 </template>
+<script>
+import axios from 'axios'
+export default {
+  data(){
+
+  }
+}
+</script>
