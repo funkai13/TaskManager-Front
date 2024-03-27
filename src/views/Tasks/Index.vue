@@ -1,16 +1,18 @@
 <script setup>
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
-
+import { useAuthStore } from '@/stores/auth';
 const task = ref(null)
+const store = useAuthStore()
 
+console.log(store.$state.authToken)
 onMounted(async () => {
   try {
     const response = await axios.get('http://127.0.0.1:8000/api/tasks')
     task.value = response.data.data
     console.log(task.value)
-
-
+  console.log()
+console.log()
   } catch (error) {
     console.log('error', error)
   }

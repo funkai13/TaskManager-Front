@@ -11,7 +11,7 @@ import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 </script>
 <template>
-  <nav class="  z-50 fixed  overflow-x-hidden bg-white border-gray-200 dark:bg-gray-900 w-full lg:text-2xl mt-1">
+  <nav class="  z-50   overflow-x-hidden bg-white border-gray-200 dark:bg-gray-900 w-full lg:text-2xl mt-1">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
       <div class="flex items-center space-x-3 rtl:space-x-reverse">
         <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Vue.js_Logo_2.svg" class="h-8" alt="Logo" />
@@ -49,7 +49,7 @@ const authStore = useAuthStore()
         >
           <li>
             <div
-              class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
+              class="block py-2 px-3 text-gray-900  md:hover:text-blue-700 rounded md:bg-transparent  md:p-0 dark:text-white md:dark:text-blue-500"
               aria-current="page"
             >
               <RouterLink to="/tasks">Task</RouterLink>
@@ -59,14 +59,14 @@ const authStore = useAuthStore()
             <div
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
             >
-              <RouterLink to="employees">Employees</RouterLink>
+              <RouterLink to="employees" v-if="authStore.user">Employees</RouterLink>
             </div>
           </li>
           <li>
             <div
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
             >
-              <RouterLink to="/register">Register</RouterLink>
+              <RouterLink to="/register" v-if="authStore.user" >Register</RouterLink>
             </div>
           </li>
           <li>
@@ -74,15 +74,8 @@ const authStore = useAuthStore()
 
               class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
               >
-              <RouterLink to="/login">logOut</RouterLink>
+              <button @click="$event=>authStore.logout">logout</button>
             </div
-            >
-          </li>
-          <li>
-            <a
-              href="#"
-              class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-              >Contact</a
             >
           </li>
         </ul>
