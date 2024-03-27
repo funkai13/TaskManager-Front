@@ -3,15 +3,22 @@ import axios from 'axios'
 import { ref, onMounted } from 'vue'
 const task = ref(null)
 import { useAuthStore } from '@/stores/auth.js'
-import { useTaskstore } from '@/stores/task.js'
 import router from '@/router/index.js'
 const authStore = useAuthStore()
+import { initFlowbite } from 'flowbite'
 //const taskStore = useTaskstore()
 const id =authStore.id
 const taskToDelete = ref(null)
 const showModal = ref(false)
 const showModalE = ref(false)
 const taskToEdit = ref (null)
+const showAllTasksButton = ref(true);
+console.log(showAllTasksButton.value)
+
+// initialize components based on data attribute selectors
+onMounted(() => {
+  initFlowbite();
+})
 const form = ref({
   status_id: '',
   employee_id: '',
@@ -83,6 +90,7 @@ const cancelEdit=()=>{
 const confirmEdit = async ()  => {
    showModalE.value=false;
    console.log(form.value)
+  if (authStore.role === 'admin'){
   try {
       await axios.put(`http://127.0.0.1:8000/api/tasks/${taskToEdit.value.id}`,form.value)
       await reloadTasks()
@@ -94,19 +102,54 @@ const confirmEdit = async ()  => {
   }
   console.log(form.value);
   await router.push('/tasks');
+  }else {
+    form.value.id=taskToEdit.value.id;
+    form.value.title=taskToEdit.value.title;
+    form.value.description=taskToEdit.value.description;
+    form.value.employee_id=taskToEdit.value.employee_id;
+    try {
+      await axios.put(`http://127.0.0.1:8000/api/tasks/${taskToEdit.value.id}`,form.value)
+      await reloadTasks()
+        .then(response =>{
+          console.log(response)
+        })
+    } catch (error){
+      console.log(error);
+    }
+    }
 }
-
+const allTacksCall = async () =>{
+  const response = await axios.get('http://127.0.0.1:8000/api/tasks')
+  task.value = response.data.data
+  console.log(task.value)
+  showAllTasksButton.value = false;
+  console.log(showAllTasksButton.value)
+}
+const employeeTacksCall = async () =>{
+  const id =authStore.id
+  const response = await axios.get(`http://127.0.0.1:8000/api/employees/${id}/task`)
+  task.value = response.data.data.tasks
+  console.log(task.value)
+  showAllTasksButton.value = true;
+}
 </script>
 <template>
-  <section class=" grid h-16 place-items-center pt-10 ">
-    <div>
-      <p class="xl:text-4xl pb-6 text-2xl items-center justify-center flex">All tasks</p>
+    <section class=" grid h-16 place-items-center  ">
+    <div class="pt-10 sm:px-6 lg:px-8 xl:px-10 2xl:px-2">
+      <p  v-if="authStore.role==='admin' " class="xl:text-4xl pb-6 text-2xl items-center justify-center flex">All tasks</p>
+      <p  v-if="authStore.role==='employee' " class="xl:text-4xl pb-6 text-2xl items-center justify-center flex"> your tasks</p>
       <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" v-if="authStore.role==='admin'">
         <router-link to="/create/task"> Create Task</router-link>
       </button>
-      <div class="container overflow-x-auto shadow-md sm:rounded-lg flex flex-col justify-center  items-center  w-full">
-        <table class=" text-sm w-full text-left rtl:text-right text-gray-500 dark:text-gray-400 lg:text-xl">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 lg:text-xl">
+        <button   v-if="authStore.role === 'employee'" @click="allTacksCall" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
+         See all Tasks
+      </button>
+      <button  v-if="authStore.role === 'employee' " @click="employeeTacksCall"  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" >
+        back to Your Tasks
+      </button>
+      <div class="container overflow-x-auto shadow-md sm:rounded-lg hidden sm:block flex-col justify-center  items-center  w-full">
+        <table class=" text-sm  table-auto min-w-full text-left rtl:text-right text-gray-500 dark:text-gray-400 lg:text-based ">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 lg:text-lg">
           <tr>
             <th scope="col" class="px-6 py-3">
               #
@@ -156,17 +199,36 @@ const confirmEdit = async ()  => {
             <td class="px-6 py-4">
                {{task.modified_by}}
             </td>
-            <td class="px-6 py-4 text-right " >
-              <button type="button" @click="showModalEdit(task)" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <td class="px-6 py-4 text-right flex" >
+              <button type="button" @click="showModalEdit(task)"   class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                 Edit </button>
-              <button type="button" @click="showDeleteModal(task)"  class="text-white bg-red-600 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+              <button type="button" @click="showDeleteModal(task)"  v-if="authStore.role==='admin' "  class="text-white bg-red-600 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                 Delete </button>
+              <button type="button"    class="text-white bg-amber-500 hover:bg-amber-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                <RouterLink to="/comments"> Comments </RouterLink> </button>
             </td>
           </tr>
           </tbody>
         </table>
       </div>
+      <div class="sm:hidden  m-2">
+        <div class="grid grid-cols-1 gap-4  md-4">
+              <div  v-for="(task, index) in task" :key="index" class="bg-white rounded-lg shadow-xl p-4 dark:bg-gray-800">
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ task.title }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ task.description }}</p>
+                <div class="flex justify-around">
+                  <button @click="showModalEdit(task)" class="text-blue-700 hover:text-blue-800 focus:outline-none dark:text-blue-400">Edit</button>
+                  <button v-if="authStore.role==='admin'" @click="showDeleteModal(task)" class="text-red-700 hover:text-red-800 focus:outline-none dark:text-red-400">Delete</button>
+                  <button class="text-amber-700 hover:text-amber-800 focus:outline-none dark:text-amber-400"><RouterLink to="/comments"> Comments</RouterLink></button>
+                </div>
+
+              </div>
+
+
+        </div>
+      </div>
     </div>
+
     <div v-if="showModal" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
       <div class="bg-white rounded-lg p-8">
         <p class="text-lg font-semibold mb-4">Are you sure you want to eliminate the task with the title: {{ taskToDelete.title }}?</p>
@@ -193,14 +255,14 @@ const confirmEdit = async ()  => {
                   <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >Title</label>
                   <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                         placeholder="Type Task Title"
+                         placeholder= "title"
                          required="" type="text"
                          v-model="form.title">
                 </div>
                 <div class="w-full" >
                   <label  v-if="authStore.role==='admin' " for="brand" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Assigned Employee</label>
                   <input  v-if="authStore.role==='admin' " class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                          placeholder="Employee ID"
+                          placeholder="assigned Employee"
                           type="text"
                           v-model="form.employee_id">
                   <label   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white mt-3">Estatus</label>
@@ -217,25 +279,22 @@ const confirmEdit = async ()  => {
                 <div class="sm:col-span-2" v-if="authStore.role==='admin' ">
                   <label  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
                   <textarea class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="Your description here"
+                            placeholder="description"
                             v-model="form.description"
                             rows="8"></textarea>
                 </div>
               </div>
-              <button type="submit" class="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
-                Update Task
-              </button>
             </form>
           </div>
         </section>
         <div class="flex justify-end">
           <!-- Botón para cancelar la acción -->
           <button @click="cancelEdit" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 mr-4 rounded">
-            Cancelar
+            Cancel
           </button>
           <!-- Botón para confirmar la eliminación -->
-          <button @click="confirmEdit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
-            Eliminar
+          <button @click="confirmEdit" class="bg-blue-500 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded">
+            Update
           </button>
         </div>
       </div>

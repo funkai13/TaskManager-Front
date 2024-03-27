@@ -113,7 +113,7 @@ onMounted(async () => {
         <div class="flex justify-end">
           <!-- Botón para cancelar la acción -->
           <button @click="cancelDelete" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 mr-4 rounded">
-            Cancelar
+            Cancel
           </button>
           <!-- Botón para confirmar la eliminación -->
           <button @click="confirmDelete" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">

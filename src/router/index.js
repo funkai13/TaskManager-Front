@@ -51,14 +51,14 @@ const router = createRouter({
     }
   ]
 })
-// router.beforeEach(async (to) => {
-//   const publicPages = ['/login', '/register']
-//   const authRequired = !publicPages.includes(to.path)
-//   const auth = useAuthStore()
-//   if (authRequired && !auth.role) {
-//     auth.returnUrl = to.fullPath
-//     return '/login'
-//   }
-// })
+router.beforeEach(async (to) => {
+  const publicPages = ['/login', '/register']
+  const authRequired = !publicPages.includes(to.path)
+  const auth = useAuthStore()
+  if (authRequired && !auth.role) {
+    auth.returnUrl = to.fullPath
+    return '/login'
+  }
+})
 
 export default router
