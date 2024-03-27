@@ -1,14 +1,20 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { initFlowbite } from 'flowbite'
-import { useAuthStore } from '@/stores/auth.js'
+import { useAuthStore } from '@/stores/auth';
+
 
 const authStore = useAuthStore();
+console.log(authStore.token)
 const form = ref({
+  name:'',
   email: '',
   password: '',
+  role: '',
 });
-
+const submitForm = async () => {
+  await authStore.register(form.value)
+}
 // initialize components based on data attribute selectors
 onMounted(() => {
   initFlowbite()
@@ -27,7 +33,7 @@ onMounted(() => {
           <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
             Create and account
           </h1>
-          <form class="space-y-4 md:space-y-6" @submit="$event => authStore.register(form)">
+          <form class="space-y-4 md:space-y-6" @submit.prevent="submitForm">
             <div>
               <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"> email</label>
               <input type="email" name="email" id="email"
@@ -37,7 +43,7 @@ onMounted(() => {
               <label for="user" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" >User</label>
               <input type="text" name="user" id="user"
                      class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                     placeholder="name@company.com" required="" v-model="form.user">
+                     placeholder="name@company.com" required="" v-model="form.name">
             </div>
             <div>
               <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -48,9 +54,6 @@ onMounted(() => {
 
               <label for="confirm-password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm
                 password</label>
-              <input type="confirm-password" name="confirm-password" id="confirm-password" placeholder="••••••••"
-                     class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                     required="">
             </div>
             <div class="flex items-start">
             </div>

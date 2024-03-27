@@ -1,18 +1,13 @@
 <script setup>
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth';
 const task = ref(null)
-const store = useAuthStore()
 
-console.log(store.$state.authToken)
+
 onMounted(async () => {
   try {
     const response = await axios.get('http://127.0.0.1:8000/api/tasks')
     task.value = response.data.data
-    console.log(task.value)
-  console.log()
-console.log()
   } catch (error) {
     console.log('error', error)
   }
@@ -21,7 +16,10 @@ console.log()
 <template>
   <section class=" grid h-16 place-items-center pt-10 ">
     <div>
-      <p class="xl:text-4xl pb-6 text-2xl">All tasks</p>
+      <p class="xl:text-4xl pb-6 text-2xl items-center justify-center flex">All tasks</p>
+      <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+        <router-link to="/createtask"> Create Task</router-link>
+      </button>
       <div class="container overflow-x-auto shadow-md sm:rounded-lg flex flex-col justify-center  items-center  w-full">
         <table class=" text-sm w-full text-left rtl:text-right text-gray-500 dark:text-gray-400 lg:text-xl">
           <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 lg:text-xl">

@@ -30,8 +30,8 @@ const router = createRouter({
       component: () => import('../views/Tasks/Index.vue')
     },
     {
-      path: '/create',
-      name: 'create',
+      path: '/createtask',
+      name: 'createtask',
       component: () => import('../views/Tasks/Create.vue')
     },
     {
@@ -51,14 +51,14 @@ const router = createRouter({
     }
   ]
 })
-router.beforeEach(async (to) => {
-  const publicPages = ['/login', '/register']
-  const authRequired = !publicPages.includes(to.path)
-  const auth = useAuthStore()
-  if (authRequired && !auth.role) {
-    auth.returnUrl = to.fullPath
-    return '/login'
-  }
-})
+// router.beforeEach(async (to) => {
+//   const publicPages = ['/login', '/register']
+//   const authRequired = !publicPages.includes(to.path)
+//   const auth = useAuthStore()
+//   if (authRequired && !auth.role) {
+//     auth.returnUrl = to.fullPath
+//     return '/login'
+//   }
+// })
 
 export default router
