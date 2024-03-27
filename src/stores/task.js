@@ -1,15 +1,18 @@
 
 import { defineStore } from 'pinia'
 
-export const useTaskstore = defineStore('task', {
-  state: () => ({ task: null, authToken: null ,authRole:null}),
+export const useTaskStore = defineStore('task', {
+  state: () => ({ taskSelected: null, }),
   getters: {
-    task: (state) => state.task,
+    taskSelect: (state) => state.taskSelected
   },
   actions:
     {
-      setTask(task) {
-        this.task = task;
+      setTask(newtask) {
+        this.task = newtask;
+      },
+      addTask(task) {
+        this.task=(task);
       },
       persist: true
     }

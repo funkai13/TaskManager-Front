@@ -12,20 +12,10 @@ const form = ref({
   status_id: '',
   employee_id: '',
 });
-// onMounted(async () => {
-//   try {
-//     await axios.post('http://127.0.0.1:8000/api/tasks',form.value)
-//       .then(response =>{
-//         console.log(response)
-//       })
-//
-//   } catch (error) {
-//     console.log('error', error)
-//   }
-// })
+
 const submitForm = async () => {
   try {
-    await axios.post('http://127.0.0.1:8000/api/tasks',form.value)
+    await axios.post('/api/tasks',form.value)
       .then(response =>{
       console.log(response)
     })

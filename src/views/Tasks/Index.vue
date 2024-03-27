@@ -1,12 +1,14 @@
 <script setup>
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
-const task = ref(null)
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.js'
+import {useTaskStore} from '@/stores/task.js'
 import router from '@/router/index.js'
-const authStore = useAuthStore()
 import { initFlowbite } from 'flowbite'
-//const taskStore = useTaskstore()
+const task = ref(null)
+const authStore = useAuthStore()
+const taskStore = useTaskStore()
 const id =authStore.id
 const taskToDelete = ref(null)
 const showModal = ref(false)
@@ -30,10 +32,10 @@ const form = ref({
  const reloadTasks = async () => {
   try {
     if (authStore.role === 'admin') {
-      const response = await axios.get('http://127.0.0.1:8000/api/tasks')
+      const response = await axios.get('/api/tasks')
       task.value = response.data.data
     } else {
-      const response = await axios.get(`http://127.0.0.1:8000/api/employees/${id}/task`)
+      const response = await axios.get(`/api/employees/${id}/task`)
       task.value = response.data.data.tasks
     }
   } catch (error) {
@@ -64,14 +66,14 @@ const confirmDelete = async ()  =>{
 onMounted(async () => {
   try {
     if(authStore.role==='admin'){
-      const response = await axios.get('http://127.0.0.1:8000/api/tasks')
+      const response = await axios.get('/api/tasks')
       task.value = response.data.data
       console.log(task.value)
     }
     else {
-      const response = await axios.get(`http://127.0.0.1:8000/api/employees/${id}/task`)
+      const response = await axios.get(`/api/employees/${id}/task`)
       task.value = response.data.data.tasks
-      console.log(task.value)
+
     }
   } catch (error) {
     console.log('error', error)
@@ -87,12 +89,20 @@ const cancelEdit=()=>{
   taskToEdit.value=null;
 }
 
+const resetForm = () => {
+    form.value.status_id = ''
+    form.value.employee_id = ''
+    form.value.title = ''
+    form.value.description =''
+    form.value.created_by = 'admin'
+}
 const confirmEdit = async ()  => {
    showModalE.value=false;
    console.log(form.value)
   if (authStore.role === 'admin'){
   try {
-      await axios.put(`http://127.0.0.1:8000/api/tasks/${taskToEdit.value.id}`,form.value)
+      await axios.put(`/api/tasks/${taskToEdit.value.id}`,form.value)
+      resetForm()
       await reloadTasks()
       .then(response =>{
         console.log(response)
@@ -108,7 +118,7 @@ const confirmEdit = async ()  => {
     form.value.description=taskToEdit.value.description;
     form.value.employee_id=taskToEdit.value.employee_id;
     try {
-      await axios.put(`http://127.0.0.1:8000/api/tasks/${taskToEdit.value.id}`,form.value)
+      await axios.put(`/api/tasks/${taskToEdit.value.id}`,form.value)
       await reloadTasks()
         .then(response =>{
           console.log(response)
@@ -119,19 +129,23 @@ const confirmEdit = async ()  => {
     }
 }
 const allTacksCall = async () =>{
-  const response = await axios.get('http://127.0.0.1:8000/api/tasks')
+  const response = await axios.get('/api/tasks')
   task.value = response.data.data
-  console.log(task.value)
   showAllTasksButton.value = false;
   console.log(showAllTasksButton.value)
 }
 const employeeTacksCall = async () =>{
   const id =authStore.id
-  const response = await axios.get(`http://127.0.0.1:8000/api/employees/${id}/task`)
+  const response = await axios.get(`/api/employees/${id}/task`)
   task.value = response.data.data.tasks
   console.log(task.value)
   showAllTasksButton.value = true;
 }
+const taskToStore = (task)=> {
+  taskStore.setTask(task)
+  router.push('/comments');
+}
+
 </script>
 <template>
     <section class=" grid h-16 place-items-center  ">
@@ -200,12 +214,12 @@ const employeeTacksCall = async () =>{
                {{task.modified_by}}
             </td>
             <td class="px-6 py-4 text-right flex" >
-              <button type="button" @click="showModalEdit(task)"   class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+              <button type="button" v-if="authStore.role==='admin' || id===task.employee_id" @click="showModalEdit(task)"   class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                 Edit </button>
               <button type="button" @click="showDeleteModal(task)"  v-if="authStore.role==='admin' "  class="text-white bg-red-600 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                 Delete </button>
-              <button type="button"    class="text-white bg-amber-500 hover:bg-amber-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                <RouterLink to="/comments"> Comments </RouterLink> </button>
+              <button type="button"  @click="taskToStore(task)"  class="text-white bg-amber-500 hover:bg-amber-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+               Comments </button>
             </td>
           </tr>
           </tbody>
@@ -217,9 +231,9 @@ const employeeTacksCall = async () =>{
                 <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ task.title }}</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">{{ task.description }}</p>
                 <div class="flex justify-around">
-                  <button @click="showModalEdit(task)" class="text-blue-700 hover:text-blue-800 focus:outline-none dark:text-blue-400">Edit</button>
+                  <button v-if="authStore.role==='admin' || id===task.employee_id" @click="showModalEdit(task)" class="text-blue-700 hover:text-blue-800 focus:outline-none dark:text-blue-400 ">Edit</button>
                   <button v-if="authStore.role==='admin'" @click="showDeleteModal(task)" class="text-red-700 hover:text-red-800 focus:outline-none dark:text-red-400">Delete</button>
-                  <button class="text-amber-700 hover:text-amber-800 focus:outline-none dark:text-amber-400"><RouterLink to="/comments"> Comments</RouterLink></button>
+                  <button @click="taskToStore(task)"  class="text-amber-700 hover:text-amber-800 focus:outline-none dark:text-amber-400"> Comments</button>
                 </div>
 
               </div>

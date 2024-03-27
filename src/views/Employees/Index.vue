@@ -98,30 +98,13 @@ onMounted(async () => {
             <td class="px-6 py-4">
               {{employee.code}}
             </td>
-            <td class="px-6 py-4 text-right">
-              <button type="button"  @click="showDeleteModal(employee)"  class="text-white bg-red-600 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                Delete </button>
-            </td>
+
           </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <div v-if="showModal" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
-      <div class="bg-white rounded-lg p-8">
-        <p class="text-lg font-semibold mb-4">¿Are you sure you want to eliminate the employee {{ employeeToDelete.name }}?</p>
-        <div class="flex justify-end">
-          <!-- Botón para cancelar la acción -->
-          <button @click="cancelDelete" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 mr-4 rounded">
-            Cancel
-          </button>
-          <!-- Botón para confirmar la eliminación -->
-          <button @click="confirmDelete" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
-            Eliminar
-          </button>
-        </div>
-      </div>
-    </div>
+
   </section>
 </template>
 

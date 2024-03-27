@@ -9,8 +9,13 @@ const form = ref({
   password: '',
 });
 
+const resetForm = () => {
+  form.value.email = '';
+  form.value.password = '';
+}
 const submitForm = async () => {
   await authStore.login(form.value)
+  resetForm()
 }
 
 // initialize components based on data attribute selectors

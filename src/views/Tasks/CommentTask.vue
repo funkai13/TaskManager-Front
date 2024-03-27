@@ -1,8 +1,46 @@
 <script setup>
 import { onMounted } from 'vue'
 import { initFlowbite } from 'flowbite'
+import {useTaskStore} from '@/stores/task.js'
+import { ref } from 'vue'
+import axios from 'axios'
+import router from '@/router/index.js'
+const comments = ref(null);
+const taskStore = useTaskStore()
+const task =taskStore.task
+console.log(task)
 
-// initialize components based on data attribute selectors
+const form = ref({
+  task_id: '2',
+  comment: '',
+  created_by:'admin',
+  active: '1'
+});
+onMounted(async () => {
+  try {
+    const response = await axios.get('/api/comment_tasks')
+    comments.value = response.data.data
+    console.log(comments.value)
+
+  } catch (error) {
+    console.log('error', error)
+  }
+})
+const submitForm = async () => {
+  try {
+    console.log(form.value)
+    await axios.post('/api/comment_tasks',form.value)
+      .then(response =>{
+        console.log(response)
+      })
+  } catch (error) {
+    console.log('error', error)
+  }
+  console.log(form.value);
+  await router.push('/tasks');
+}
+
+
 onMounted(() => {
   initFlowbite()
 })
@@ -10,21 +48,24 @@ onMounted(() => {
 
 <template>
 <div class="flex justify-center  flex-col items-center w-full container mx-auto  mt-12">
-
-  <div  class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+  <div  class="flex flex-col w-full items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
     <div class="flex flex-col  justify-between p-4 leading-normal">
-      <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Task title</h5>
-      <p class="mb-2 text-xl font-medium tracking-tight text-gray-900 dark:text-white"> employee</p>
-      <p class="mb-2 text-xl font-medium tracking-tight text-gray-900 dark:text-white"> status</p>
-      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order
-        mmmmmkjskssksksskh mira estamos probnado a ver si esta madre truena o crese esperemos que crezca por que si no me va llegar la puta mierda apoco no carnal listo si corrio se movio bien .</p>
+      <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{task.title}}</h5>
+      <p class="mb-2 text-xl font-medium tracking-tight text-gray-900 dark:text-white">  {{
+          task.status_id === 1 ? 'Pendiente' :
+            task.status_id === 2 ? 'En proceso' :
+              task.status_id === 3 ? 'Bloqueado' :
+                task.status_id !== 4 ? 'Estado desconocido' : 'Completado'
+        }}</p>
+      <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{task.description}}</p>
     </div>
   </div>
-  <form class="flex flex-col items-center w-full  md:max-w-xl m-2">
+
+  <form  @submit.prevent="submitForm"  class="flex flex-col items-center w-full  md:max-w-xl m-2">
     <div class="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
       <div class="px-4 py-2 bg-white rounded-t-lg dark:bg-gray-800">
         <label for="comment" class="sr-only">Your comment</label>
-        <textarea id="comment" rows="4" class="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400" placeholder="Write a comment..." required />
+        <textarea v-model="form.comment"  id="comment" rows="4" class="w-full px-0 text-sm text-gray-900 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400" placeholder="Write a comment..." required />
       </div>
       <div class="flex items-center justify-between px-3 py-2 border-t dark:border-gray-600">
         <button type="submit" class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
@@ -53,109 +94,42 @@ onMounted(() => {
       </div>
     </div>
   </form>
-  <div class="flex items-start gap-2.5   md:max-w-xl mb-2" >
-    <div class="flex flex-col w-full  leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
-      <div class="flex items-center space-x-2 rtl:space-x-reverse">
-        <span class="text-sm font-semibold text-gray-900 dark:text-white">Bonnie Green</span>
-        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">11:46</span>
-      </div>
-      <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">estas en un gran problema no has terminado el task y ya tenemos poco tiempo para entregarlo eres un estupido pero bueno que sabras tu  si nunca has vivido dos carajoas de dificultad en tu vida al parecer si funciona se rompe cuando ponemos el moenton de sss a lo estupido correcto esta cosa funciona perfectamente sin problema alguna que felcidaid solo me queda modificarla uin poco para que queden los coments uno abajo de otroque puta maravilla uwu</p>
-      <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
-    </div>
-    <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" data-dropdown-placement="bottom-start" class="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800 dark:focus:ring-gray-600" type="button">
-      <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-        <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-      </svg>
-    </button>
-    <div id="dropdownDots" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-40 dark:bg-gray-700 dark:divide-gray-600">
-      <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reply</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Forward</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Copy</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Report</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Delete</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="flex items-start gap-2.5   md:max-w-xl mb-2 " >
-    <div class="flex flex-col w-full  leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
-      <div class="flex items-center space-x-2 rtl:space-x-reverse">
-        <span class="text-sm font-semibold text-gray-900 dark:text-white">Bonnie Green</span>
-        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">11:46</span>
-      </div>
-      <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">estas en un gran problema no has terminado el task y ya tenemos poco tiempo para entregarlo eres un estupido pero bueno que sabras tu  si nunca has vivido dos carajoas de dificultad en tu vida al parecer si funciona se rompe cuando ponemos el moenton de sss a lo estupido correcto esta cosa funciona perfectamente sin problema alguna que felcidaid solo me queda modificarla uin poco para que queden los coments uno abajo de otroque puta maravilla uwu</p>
-      <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
-    </div>
-    <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" data-dropdown-placement="bottom-start" class="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800 dark:focus:ring-gray-600" type="button">
-      <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-        <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-      </svg>
-    </button>
-    <div id="dropdownDots" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-40 dark:bg-gray-700 dark:divide-gray-600">
-      <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reply</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Forward</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Copy</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Report</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Delete</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="flex items-start gap-2.5   md:max-w-xl mb-2">
-    <div class="flex flex-col w-full  leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
-      <div class="flex items-center space-x-2 rtl:space-x-reverse">
-        <span class="text-sm font-semibold text-gray-900 dark:text-white">Bonnie Green</span>
-        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">11:46</span>
-      </div>
-      <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">estas en un gran problema no has terminado el task y ya tenemos poco tiempo para entregarlo eres un estupido pero bueno que sabras tu  si nunca has vivido dos carajoas de dificultad en tu vida al parecer si funciona se rompe cuando ponemos el moenton de sss a lo estupido correcto esta cosa funciona perfectamente sin problema alguna que felcidaid solo me queda modificarla uin poco para que queden los coments uno abajo de otroque puta maravilla uwu</p>
-      <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
-    </div>
-    <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" data-dropdown-placement="bottom-start" class="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800 dark:focus:ring-gray-600" type="button">
-      <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
-        <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
-      </svg>
-    </button>
-    <div id="dropdownDots" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-40 dark:bg-gray-700 dark:divide-gray-600">
-      <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reply</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Forward</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Copy</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Report</a>
-        </li>
-        <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Delete</a>
-        </li>
-      </ul>
-    </div>
-  </div>
 
+
+  <div  v-for="(comment, index) in comments" class="flex items-start gap-2.5  w-full  md:max-w-xl mb-2" >
+    <div class="flex flex-col w-full  leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
+      <div class="flex items-center space-x-2 rtl:space-x-reverse">
+        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{comment.created_by}}</span>
+        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">11:46</span>
+      </div>
+      <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white"> {{ comment.comment }}</p>
+      <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
+    </div>
+    <button id="dropdownMenuIconButton" data-dropdown-toggle="dropdownDots" data-dropdown-placement="bottom-start" class="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800 dark:focus:ring-gray-600" type="button">
+      <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
+        <path d="M3.5 1.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 6.041a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Zm0 5.959a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
+      </svg>
+    </button>
+    <div id="dropdownDots" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-40 dark:bg-gray-700 dark:divide-gray-600">
+      <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconButton">
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reply</a>
+        </li>
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Forward</a>
+        </li>
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Copy</a>
+        </li>
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Report</a>
+        </li>
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Delete</a>
+        </li>
+      </ul>
+    </div>
+  </div>
 
 
 

@@ -15,7 +15,7 @@ const form = ref({
 
 const submitForm = async () => {
   try {
-    await axios.put('http://127.0.0.1:8000/api/tasks',form.value)
+    await axios.put('/api/tasks',form.value)
       .then(response =>{
         console.log(response)
       })
