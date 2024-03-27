@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 export const useAuthStore = defineStore('auth', {
   state: () => ({ authUser: null, authToken: null ,authRole:null}),
   getters: {
-    user: (state) => state.authUser,
+    id: (state) => state.authId,
     token: (state) => state.authToken,
     role: (state) => state.authRole,
   },
@@ -14,8 +14,8 @@ export const useAuthStore = defineStore('auth', {
       this.authToken = token;
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     },
-    setAuthUser(user) {
-      this.authUser = user;
+    setAuthUser(id) {
+      this.authId = id;
     },
     setAuthRole(role) {
       this.authRole = role;
@@ -25,7 +25,10 @@ export const useAuthStore = defineStore('auth', {
       await axios
         .post('api/auth/login', form,)
         .then((res) => {
-          const { access_token, id, role } = res.data;
+          const { access_token, role } = res.data;
+          const id = res.data.data.id;
+          console.log(res.data);
+          console.log(id);
           this.setAuthToken(access_token);
           this.setAuthUser(id);
           this.setAuthRole(role);

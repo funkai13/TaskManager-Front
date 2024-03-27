@@ -30,13 +30,13 @@ const router = createRouter({
       component: () => import('../views/Tasks/Index.vue')
     },
     {
-      path: '/createtask',
+      path: '/create/task',
       name: 'createtask',
       component: () => import('../views/Tasks/Create.vue')
     },
     {
-      path: '/edit/:id',
-      name: 'edit',
+      path: '/edit/task',
+      name: 'edittask',
       component: () => import('../views/Tasks/Edit.vue')
     },
     {

@@ -2,23 +2,71 @@
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
 const task = ref(null)
+import { useAuthStore } from '@/stores/auth.js'
+const authStore = useAuthStore()
+const id =authStore.id
+const taskToDelete = ref(null)
+const showModal = ref(false)
 
+ const reloadTasks = async () => {
+  try {
+    if (authStore.role === 'admin') {
+      const response = await axios.get('http://127.0.0.1:8000/api/tasks')
+      task.value = response.data.data
+    } else {
+      const response = await axios.get(`http://127.0.0.1:8000/api/employees/${id}/task`)
+      task.value = response.data.data.tasks
+    }
+  } catch (error) {
+    console.log('error', error)
+  }
+}
+
+const showDeleteModal=(task)=>{
+  taskToDelete.value=task
+  showModal.value= true;
+}
+
+const cancelDelete=()=>{
+  showModal.value=false;
+  taskToDelete.value=null;
+}
+
+const confirmDelete = async ()  =>{
+  showModal.value =false;
+  console.log(taskToDelete.value);
+  try {
+   await axios.delete(`http://127.0.0.1:8000/api/tasks/${taskToDelete.value.id}`)
+   await reloadTasks();
+  }catch (error){
+    console.log(error);
+  }
+}
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/tasks')
-    task.value = response.data.data
+    if(authStore.role==='admin'){
+      const response = await axios.get('http://127.0.0.1:8000/api/tasks')
+      task.value = response.data.data
+    }
+    else {
+      const response = await axios.get(`http://127.0.0.1:8000/api/employees/${id}/task`)
+      task.value = response.data.data.tasks
+      console.log(task.value)
+    }
   } catch (error) {
     console.log('error', error)
   }
 })
+
+
 </script>
 <template>
   <section class=" grid h-16 place-items-center pt-10 ">
     <div>
       <p class="xl:text-4xl pb-6 text-2xl items-center justify-center flex">All tasks</p>
-      <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-        <router-link to="/createtask"> Create Task</router-link>
+      <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" v-if="authStore.role==='admin'">
+        <router-link to="/create/task"> Create Task</router-link>
       </button>
       <div class="container overflow-x-auto shadow-md sm:rounded-lg flex flex-col justify-center  items-center  w-full">
         <table class=" text-sm w-full text-left rtl:text-right text-gray-500 dark:text-gray-400 lg:text-xl">
@@ -33,10 +81,10 @@ onMounted(async () => {
             <th scope="col" class="px-6 py-3">
               Description
             </th>
-            <th scope="col" class="px-6 py-3">
+            <th scope="col" class="px-6 py-3" v-if="authStore.role==='admin'">
               Employee
             </th>
-            <th scope="col" class="px-6 py-3">
+            <th scope="col" class="px-6 py-3" >
               estatus
             </th>
             <th scope="col" class="px-6 py-3">
@@ -58,27 +106,44 @@ onMounted(async () => {
             <td class="px-6 py-4">
               {{task.description}}
             </td>
-            <td class="px-6 py-4">
+            <td class="px-6 py-4" v-if="authStore.role==='admin'">
               {{task.employee_id}}
             </td>
             <td class="px-6 py-4">
               {{
                 task.status_id === 1 ? 'Pendiente' :
-                 task.status_id === 2 ? 'En proceso' :
+                  task.status_id === 2 ? 'En proceso' :
                     task.status_id === 3 ? 'Bloqueado' :
-                    task.status_id === 4 ? 'Completado' :
-                        'Estado desconocido'
+                      task.status_id !== 4 ? 'Estado desconocido' : 'Completado'
               }}
             </td>
             <td class="px-6 py-4">
-              pedro {{task.modified_by}}
+               {{task.modified_by}}
             </td>
-            <td class="px-6 py-4 text-right">
-              <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">edit</button>
+            <td class="px-6 py-4 text-right " >
+              <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                <RouterLink to="/edit/task">Edit</RouterLink> </button>
+              <button type="button" @click="showDeleteModal(task)"  class="text-white bg-red-600 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                Delete </button>
             </td>
           </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+    <div v-if="showModal" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+      <div class="bg-white rounded-lg p-8">
+        <p class="text-lg font-semibold mb-4">Are you sure you want to eliminate the task with the title: {{ taskToDelete.title }}?</p>
+        <div class="flex justify-end">
+          <!-- Botón para cancelar la acción -->
+          <button @click="cancelDelete" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 mr-4 rounded">
+            Cancelar
+          </button>
+          <!-- Botón para confirmar la eliminación -->
+          <button @click="confirmDelete" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+            Eliminar
+          </button>
+        </div>
       </div>
     </div>
   </section>
