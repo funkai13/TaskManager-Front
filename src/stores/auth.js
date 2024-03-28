@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', {
     id: (state) => state.authId,
     token: (state) => state.authToken,
     role: (state) => state.authRole,
+    password: (state) => state.password,
   },
   actions:
   {
@@ -27,11 +28,19 @@ export const useAuthStore = defineStore('auth', {
           const { access_token, role,  } = res.data;
           console.log(res.data)
           const id = res.data.user.id;
-          this.setAuthToken(access_token);
-          this.setAuthUser(id);
-          this.setAuthRole(role);
-          this.router.push('/tasks');
-
+          const verified =res.data.user.email_verified_at
+           if ( verified === null){
+            this.router.push('/newpassword')
+             this.setAuthToken(access_token);
+             this.setAuthUser(id);
+             this.setAuthRole(role);
+          }
+           else {
+             this.setAuthToken(access_token);
+             this.setAuthUser(id);
+             this.setAuthRole(role);
+             this.router.push('/tasks');
+           }
         })
         .catch((errors) => {
           console.log(errors);
