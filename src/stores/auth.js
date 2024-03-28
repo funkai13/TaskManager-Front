@@ -2,7 +2,7 @@ import axios  from 'axios'
 import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({ authUser: null, authToken: null ,authRole:null authTokenCsrf: null}),
+  state: () => ({ authUser: null, authToken: null ,authRole:null, authTokenCsrf: null}),
   getters: {
     id: (state) => state.authId,
     token: (state) => state.authToken,
