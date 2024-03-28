@@ -7,14 +7,12 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 
-
 window.axios = axios
 
 window.axios.defaults.baseURL = 'https://sea-lion-app-5j6li.ondigitalocean.app/'
 window.axios.defaults.headers.common['Accept'] = 'application/json'
 window.axios.defaults.headers.common['Content-Type'] = 'application/json'
-window.axios.defaults.headers.common['X-Requested-with'] = 'XMLHttpRequest'
-window.axios.defaults.withCredentials = true
+window.axios.defaults.withCredentials = false
 
 const pinia = createPinia()
 pinia.use(({ store }) => {

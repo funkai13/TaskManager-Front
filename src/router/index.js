@@ -48,6 +48,11 @@ const router = createRouter({
       path:'/comments',
       name:'comments',
       component: () => import('../views/Tasks/CommentTask.vue')
+    },
+    {
+      path:'/newpassword',
+      name:'newpassword',
+      component: () => import('../views/NewPassword.vue')
     }
   ]
 })

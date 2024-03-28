@@ -2,14 +2,18 @@ import axios  from 'axios'
 import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({ authUser: null, authToken: null ,authRole:null}),
+  state: () => ({ authUser: null, authToken: null ,authRole:null, authTokenCsrf: null}),
   getters: {
     id: (state) => state.authId,
     token: (state) => state.authToken,
     role: (state) => state.authRole,
+    TokenCsrf: (state) => state.authTokenCsrf,
   },
   actions:
   {
+    async getTokenCsrf() {
+      await axios.get('/sanctum/csrf-cookie')
+    },
     setAuthToken(token) {
       this.authToken = token;
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -21,17 +25,26 @@ export const useAuthStore = defineStore('auth', {
       this.authRole = role;
     },
     async login(form) {
+      await this.getTokenCsrf()
       await axios
         .post('api/auth/login', form,)
         .then((res) => {
           const { access_token, role,  } = res.data;
           console.log(res.data)
           const id = res.data.user.id;
-          this.setAuthToken(access_token);
-          this.setAuthUser(id);
-          this.setAuthRole(role);
-          this.router.push('/tasks');
-
+          const verified =res.data.user.email_verified_at
+           if ( verified === null){
+            this.router.push('/newpassword')
+             this.setAuthToken(access_token);
+             this.setAuthUser(id);
+             this.setAuthRole(role);
+          }
+           else {
+             this.setAuthToken(access_token);
+             this.setAuthUser(id);
+             this.setAuthRole(role);
+             this.router.push('/tasks');
+           }
         })
         .catch((errors) => {
           console.log(errors);
