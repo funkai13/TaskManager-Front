@@ -18,10 +18,8 @@ const submitForm = async () => {
 try {
   await axios.post('/api/auth/register', form.value)
     .then((response) => {
-      console.log(response)
       const default_password =response.data.password
       alert(`default new password user ${default_password}`)
-      console.log(default_password);
     })
 } catch (error) {
   console.log(error)
