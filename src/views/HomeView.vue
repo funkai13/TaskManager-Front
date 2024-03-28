@@ -1,9 +1,13 @@
 <script setup>
-import TheWelcome from '../components/TheWelcome.vue'
+import { onMounted } from 'vue'
+import { initFlowbite } from 'flowbite'
+
+// initialize components based on data attribute selectors
+onMounted(() => {
+  initFlowbite()
+})
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <main></main>
 </template>
