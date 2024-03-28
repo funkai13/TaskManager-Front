@@ -13,16 +13,17 @@ const form = ref({
   employee_id: '',
 });
 
+
+
 const submitForm = async () => {
   try {
-    await axios.post('/api/tasks',form.value)
+    await axios.post('/api/tasks', form.value)
       .then(response =>{
       console.log(response)
     })
   } catch (error) {
     console.log('error', error)
   }
- console.log(form.value);
  await router.push('/tasks');
 }
 
