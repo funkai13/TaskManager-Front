@@ -8,7 +8,6 @@ import router from '@/router/index.js'
 const comments = ref(null);
 const taskStore = useTaskStore()
 const task =taskStore.task
-console.log(task)
 
 const form = ref({
   task_id: '2',
@@ -20,7 +19,6 @@ onMounted(async () => {
   try {
     const response = await axios.get('/api/comment_tasks')
     comments.value = response.data.data
-    console.log(comments.value)
 
   } catch (error) {
     console.log('error', error)
