@@ -24,8 +24,9 @@ export const useAuthStore = defineStore('auth', {
       await axios
         .post('api/auth/login', form,)
         .then((res) => {
-          const { access_token, role } = res.data;
-          const id = res.data.data.id;
+          const { access_token, role,  } = res.data;
+          console.log(res.data)
+          const id = res.data.user.id;
           this.setAuthToken(access_token);
           this.setAuthUser(id);
           this.setAuthRole(role);
