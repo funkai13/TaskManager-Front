@@ -2,20 +2,22 @@
 import { onMounted, ref } from 'vue'
 import { initFlowbite } from 'flowbite'
 import { useAuthStore } from '@/stores/auth';
+import axios from 'axios'
+import router from '@/router/index.js'
 
 const authStore = useAuthStore();
 const form = ref({
-  email: '',
   password: '',
 });
 
 const resetForm = () => {
-  form.value.email = '';
   form.value.password = '';
 }
 const submitForm = async () => {
-  await authStore.login(form.value)
-  resetForm()
+  await axios.post('api/auth/verify', form.value)
+  console.log(form.value.password)
+   resetForm()
+  await router.push('/tasks');
 }
 
 // initialize components based on data attribute selectors
@@ -50,19 +52,6 @@ onMounted(() => {
             <div>
               <label
                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >Your email</label
-              >
-              <input
-                v-model="form.email"
-                type="text"
-                class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="name@taskmanager.com"
-                required=""
-              />
-            </div>
-            <div>
-              <label
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >Password</label
               >
               <input
@@ -73,6 +62,8 @@ onMounted(() => {
                 required=""
               />
             </div>
+
+
             <div class="flex items-center justify-between">
             </div>
             <button

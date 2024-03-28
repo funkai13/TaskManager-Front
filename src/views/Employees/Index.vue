@@ -3,45 +3,12 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 const employees = ref(null)
-const employeeToDelete = ref(null)
-const showModal = ref(false)
 
-const reloadEmployees = async () => {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/employees')
-    employees.value = response.data.data
-    console.log(employees.value)
-    console.log((employees.value[1]))
-
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-const showDeleteModal=(employee)=>{
-  employeeToDelete.value=employee
-  showModal.value= true;
-}
-
-const cancelDelete=()=>{
-  showModal.value=false;
-  employeeToDelete.value=null;
-}
-
-const confirmDelete = async () =>{
-  showModal.value =false;
-  try {
-   await axios.delete(`http://127.0.0.1:8000/api/tasks/${employeeToDelete.value.id}`)
-  await  reloadEmployees();
-  }catch (error){
-    console.log(error);
-  }
-}
 
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/employees')
+    const response = await axios.get('api/employees')
     employees.value = response.data.data
     console.log(employees.value)
     console.log((employees.value[1]))
