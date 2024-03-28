@@ -2,15 +2,18 @@ import axios  from 'axios'
 import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({ authUser: null, authToken: null ,authRole:null}),
+  state: () => ({ authUser: null, authToken: null ,authRole:null authTokenCsrf: null}),
   getters: {
     id: (state) => state.authId,
     token: (state) => state.authToken,
     role: (state) => state.authRole,
-    password: (state) => state.password,
+    TokenCsrf: (state) => state.authTokenCsrf,
   },
   actions:
   {
+    async getTokenCsrf() {
+      await axios.get('/sanctum/csrf-cookie')
+    },
     setAuthToken(token) {
       this.authToken = token;
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -22,6 +25,7 @@ export const useAuthStore = defineStore('auth', {
       this.authRole = role;
     },
     async login(form) {
+      await this.getTokenCsrf()
       await axios
         .post('api/auth/login', form,)
         .then((res) => {
