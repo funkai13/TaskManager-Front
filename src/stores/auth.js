@@ -1,43 +1,47 @@
-import axios  from 'axios'
+import axios from 'axios'
 import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({ authUser: null, authToken: null ,authRole:null}),
+  state: () => ({ authUser: null, authToken: null, authRole: null, authTokenCsrf: null }),
   getters: {
     id: (state) => state.authId,
     token: (state) => state.authToken,
     role: (state) => state.authRole,
+    Tokencsrf: (state) => state.authCsrf
   },
-  actions:
-  {
+  actions: {
+    async getTokenCsrf() {
+      await axios.get('/sanctum/csrf-cookie')
+    },
+
     setAuthToken(token) {
-      this.authToken = token;
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      this.authToken = token
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
     },
     setAuthUser(id) {
-      this.authId = id;
+      this.authId = id
     },
     setAuthRole(role) {
-      this.authRole = role;
+      this.authRole = role
     },
     async login(form) {
-      await axios
-        .post('api/auth/login', form,)
-        .then((res) => {
-          const { access_token, role } = res.data;
-          const id = res.data.data.id;
-          this.setAuthToken(access_token);
-          this.setAuthUser(id);
-          this.setAuthRole(role);
-          this.router.push('/tasks');
-
-        })
-        .catch((errors) => {
-          console.log(errors);
-        })
+      await this.getTokenCsrf(),
+        await axios
+          .post('api/auth/login', form)
+          .then((res) => {
+            const { access_token, role } = res.data
+            const id = res.data.data.id
+            this.setAuthToken(access_token)
+            this.setAuthUser(id)
+            this.setAuthRole(role)
+            this.router.push('/tasks')
+          })
+          .catch((errors) => {
+            console.log(errors)
+          })
     },
     async register(form) {
-     const token= useAuthStore()
+      const token = useAuthStore()
       console.log(token.authToken)
       await axios
         .post('api/auth/register', form, {
@@ -51,7 +55,7 @@ export const useAuthStore = defineStore('auth', {
           this.router.push('/taks')
         })
         .catch((errors) => {
-         console.log(errors)
+          console.log(errors)
         })
     },
     async logout() {
@@ -62,6 +66,4 @@ export const useAuthStore = defineStore('auth', {
     },
     persist: true
   }
-
-
 })
